@@ -51,5 +51,6 @@ File Structure
 |   |-- style.css
 |   |-- /images
 |       |-- ... (image files)
+|-- /README.md
 
 
