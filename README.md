@@ -11,6 +11,8 @@ This is a basic eCommerce website built with HTML and CSS. It features responsiv
 - ✨ Google Fonts Integration (`Merriweather`, `Poppins`)
 - 📄 Pages: Home, About, Contact, Login, Register
 - 🔗 External Stylesheet (`style.css`)
+- Backend integration with mongodbatlas database
+- jwt authentication
 
 ---
 
@@ -19,20 +21,35 @@ This is a basic eCommerce website built with HTML and CSS. It features responsiv
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone <url link>
+cd 
 
-You can use Live Server in VS Code or open index.html directly in your browser:
-# With VS Code Live Server
-code .
+1.  **Start the Backend Server**:
+    *   Navigate to the `/backend` directory.
+    *   Run `node server.js`.
+
+2.  **Open the Frontend**:
+    *   Open your `index.html` file in a web browser or use go live on vs code
 
 File Structure
-├── index.html
-├── about.html
-├── contact.html
-├── login.html
-├── register.html
-├── style.css
-└── README.md
+/electronic-shop
+|-- /backend
+|   |-- /models
+|   |   |-- user.model.js
+|   |   |-- product.model.js
+|   |-- /routes
+|   |   |-- auth.routes.js
+|   |   |-- product.routes.js
+|   |-- server.js
+|   |-- package.json
+|-- /frontend
+|   |-- about.html
+|   |-- contact.html
+|   |-- index.html
+|   |-- login.html
+|   |-- register.html
+|   |-- style.css
+|   |-- /images
+|       |-- ... (image files)
 
 
