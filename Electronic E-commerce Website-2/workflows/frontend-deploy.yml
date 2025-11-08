@@ -1,0 +1,72 @@
+name: Deploy Electronic Shop Frontend
+
+# Controls when the workflow is triggered.
+on:
+  push:
+    branches:
+      - main # Only run when code is pushed to the main branch
+    paths:
+      - 'frontend/**' # Only run if changes are detected within the /frontend directory
+
+# A workflow run is made up of one or more jobs.
+jobs:
+  build-and-deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Define environment variables for the job (replace placeholders)
+    env:
+      S3_BUCKET_NAME: e-commerce-apps # Your S3 Bucket Name
+      CLOUDFRONT_ID: E2XJ538RKIO925 # Your CloudFront Distribution ID
+      AWS_REGION: eu-north-1 # Region where your S3 bucket is located
+
+    # Sequence of steps to execute
+    steps:
+      # 1. Checkout the source code from the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # 2. Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Use a modern Node.js version
+
+      # 3. Install dependencies specifically for the frontend project
+      - name: Install Frontend Dependencies
+        run: npm install
+        working-directory: ./frontend 
+        # Crucial: Run this command inside the /frontend directory
+
+      # 4. Build the React application
+      - name: Build React App
+        run: npm run build
+        working-directory: ./frontend
+        # This will create the production-ready files in ./frontend/build
+
+      # 5. Configure AWS Credentials using the secrets stored in GitHub
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KE }}
+          aws-region: ${{ env.AWS_REGION }} # Use the region defined above
+
+      # 6. Deploy the built files to the S3 bucket
+      - name: Deploy to S3
+        run: aws s3 sync ./frontend/build s3://${{ env.S3_BUCKET_NAME }} --delete
+        # aws s3 sync: Copies only new/changed files
+        # ./frontend/build: The source directory
+        # --delete: Deletes files in S3 that are no longer in the build folder (ensures clean deployment)
+
+      # 7. Invalidate the CloudFront cache to serve the new files immediately
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ env.CLOUDFRONT_ID }} \
+            --paths "/*"
+        # This forces the CDN to fetch the latest files from S3
+
+      # 8. Final message
+      - name: Deployment Complete
+        run: echo "Successfully deployed to S3 and cleared CloudFront cache."
